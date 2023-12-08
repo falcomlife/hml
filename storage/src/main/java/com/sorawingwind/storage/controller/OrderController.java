@@ -324,4 +324,15 @@ public class OrderController {
         // 关闭流
         write.finish();
     }
+
+    @GetMapping("/parts")
+    @PreAuthorize("hasAuthority('I-3')")
+    public RS loadParts(){
+        List<String> parts = this.dao.loadParts();
+        return RS.ok(parts.stream().map(item  ->{
+            Map<String,String> map = new HashMap<>();
+            map.put("value",item);
+            return map;
+        }).collect(Collectors.toList()));
+    }
 }

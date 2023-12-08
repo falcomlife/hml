@@ -1,12 +1,12 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: tq
+  name: hml
   namespace: self
 spec:
   selector:
     matchLabels:
-      app: tq
+      app: hml
   strategy:
     rollingUpdate:
       maxSurge: 1
@@ -15,18 +15,18 @@ spec:
   template:
     metadata:
       labels:
-        app: tq
+        app: hml
     spec:
       terminationGracePeriodSeconds: 5
       imagePullSecrets:
       - name: registry-pull-secret
       containers:
-      - name: tq
-        image: swr.cn-north-4.myhuaweicloud.com/cotte-internal/tq:0.0.1
+      - name: hml
+        image: swr.cn-north-4.myhuaweicloud.com/cotte-internal/hml:0.0.1
         imagePullPolicy: Always
         ports:
         - containerPort: 8080
-          name: tq
+          name: hml
         command: ["java","-jar","/opt/microservice.jar","--spring.profiles.active=test"]
         resources:
           limits:
@@ -37,24 +37,24 @@ spec:
             memory: 500Mi
         volumeMounts:
         - mountPath: /opt/storage/images/
-          name: tq
+          name: hml
       volumes:
-      - name: tq
+      - name: hml
         persistentVolumeClaim:
-          claimName: tq
+          claimName: hml
 ---
 apiVersion: v1
 kind: Service
 metadata:
-  name: tq
+  name: hml
   namespace: self
 spec:
   ports:
   - port: 8080
-    name: tq
+    name: hml
     targetPort: 8080
     nodePort: 38888
   selector:
-    app: tq
+    app: hml
   type: NodePort
 ---

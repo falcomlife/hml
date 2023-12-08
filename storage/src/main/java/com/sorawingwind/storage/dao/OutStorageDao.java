@@ -28,6 +28,7 @@ public class OutStorageDao {
         sb.append(" o.customer_name, ");
         sb.append(" o.po_num, ");
         sb.append(" o.item, ");
+        sb.append(" o.part, ");
         sb.append(" o.color, ");
         sb.append(" o.count, ");
         sb.append(" o.code as order_code, ");
@@ -109,6 +110,7 @@ public class OutStorageDao {
         sb.append(" o.customer_name, ");
         sb.append(" o.po_num, ");
         sb.append(" o.item, ");
+        sb.append(" o.part, ");
         sb.append(" o.color, ");
         sb.append(" o.count, ");
         sb.append(" o.code as order_code, ");

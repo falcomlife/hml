@@ -41,6 +41,7 @@ public class InStorageDao {
         sb.append("o.customer_name,");
         sb.append("o.po_num,");
         sb.append("o.item,");
+        sb.append("o.part,");
         sb.append("o.count,");
         sb.append("o.code as order_code,");
         sb.append("ot.code as out_storage_code");
@@ -119,6 +120,7 @@ public class InStorageDao {
         sb.append("o.customer_name,");
         sb.append("o.po_num,");
         sb.append("o.item,");
+        sb.append("o.part,");
         sb.append("o.count,");
         sb.append("o.code as order_code,");
         sb.append("ot.code as out_storage_code");

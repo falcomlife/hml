@@ -74,6 +74,7 @@ public class InStorageController {
             aoInner.setName(item.getString("name"));
             aoInner.setPoNum(item.getString("po_num"));
             aoInner.setItem(item.getString("item"));
+            aoInner.setPart(item.getString("part"));
             aoInner.setCount(item.getBigDecimal("count"));
             aoInner.setOrderId(item.getString("order_id"));
             aoInner.setOrderCode(item.getString("order_code"));
@@ -130,6 +131,7 @@ public class InStorageController {
             aoInner.setName(item.getString("name"));
             aoInner.setPoNum(item.getString("po_num"));
             aoInner.setItem(item.getString("item"));
+            aoInner.setPart(item.getString("part"));
             aoInner.setCount(item.getBigDecimal("count"));
             aoInner.setOrderId(item.getString("order_id"));
             aoInner.setOrderCode(item.getString("order_code"));
@@ -271,6 +273,7 @@ public class InStorageController {
         iao.setCustomerNameId(doo.getCustomerName());
         iao.setPoNum(doo.getPoNum());
         iao.setItem(doo.getItem());
+        iao.setPart(doo.getPart());
         iao.setCount(doo.getCount());
         return RS.ok(iao);
     }

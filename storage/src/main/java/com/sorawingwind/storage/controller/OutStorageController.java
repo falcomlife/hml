@@ -59,6 +59,7 @@ public class OutStorageController {
             aoInner.setName(item.getString("name"));
             aoInner.setPoNum(item.getString("po_num"));
             aoInner.setItem(item.getString("item"));
+            aoInner.setPart(item.getString("part"));
             aoInner.setCount(item.getString("count"));
             aoInner.setIsDelete(0);
             aoInner.setCustomerName(customerDicts.stream().filter(dict -> dict.getId().equals(item.getString("customer_name"))).findFirst().get().getItemName());

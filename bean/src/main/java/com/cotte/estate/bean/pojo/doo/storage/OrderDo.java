@@ -36,6 +36,8 @@ public class OrderDo {
     private String poNum;
     @Column(name = "item")
     private String item;
+    @Column(name = "part")
+    private String part;
     @Column(name = "color")
     private String color;
     @Column(name = "count")

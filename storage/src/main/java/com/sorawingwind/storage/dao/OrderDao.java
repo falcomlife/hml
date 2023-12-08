@@ -12,6 +12,7 @@ import org.springframework.stereotype.Repository;
 import java.util.Collection;
 import java.util.Date;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Repository
 public class OrderDao {
@@ -134,5 +135,9 @@ public class OrderDao {
             list = el.order("po_num desc, create_time desc").findList();
         }
         return list;
+    }
+
+    public List<String> loadParts() {
+        return Ebean.createQuery(OrderDo.class).findList().stream().map(OrderDo::getPart).distinct().collect(Collectors.toList());
     }
 }

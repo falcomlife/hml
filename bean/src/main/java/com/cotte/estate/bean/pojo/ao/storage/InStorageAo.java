@@ -49,6 +49,8 @@ public class InStorageAo {
 
     private String item;
 
+    private String part;
+
     private String color;
 
     private String colorId;
