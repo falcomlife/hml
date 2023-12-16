@@ -17,8 +17,8 @@ import java.util.stream.Collectors;
 @Repository
 public class OrderDao {
 
-    public OrderDo getById(String id){
-        return Ebean.createQuery(OrderDo .class).where().idEq(id).findOne();
+    public OrderDo getById(String id) {
+        return Ebean.createQuery(OrderDo.class).where().idEq(id).findOne();
     }
 
     public List<OrderDo> getByPage(int pageIndex, int pageSize, String customerNameItem, String code, String po, String item, String starttime, String endtime) {
@@ -138,6 +138,14 @@ public class OrderDao {
     }
 
     public List<String> loadParts() {
-        return Ebean.createQuery(OrderDo.class).findList().stream().map(OrderDo::getPart).distinct().collect(Collectors.toList());
+        return Ebean.createQuery(OrderDo.class).findList().stream().map(OrderDo::getPart).filter(item -> StringUtils.isNotBlank(item)).distinct().collect(Collectors.toList());
+    }
+
+    public List<String> loadPonums() {
+        return Ebean.createQuery(OrderDo.class).findList().stream().map(OrderDo::getPoNum).filter(item -> StringUtils.isNotBlank(item)).distinct().collect(Collectors.toList());
+    }
+
+    public List<String> loadItems() {
+        return Ebean.createQuery(OrderDo.class).findList().stream().map(OrderDo::getItem).filter(item -> StringUtils.isNotBlank(item)).distinct().collect(Collectors.toList());
     }
 }

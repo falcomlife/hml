@@ -335,4 +335,26 @@ public class OrderController {
             return map;
         }).collect(Collectors.toList()));
     }
+
+    @GetMapping("/ponums")
+    @PreAuthorize("hasAuthority('I-3')")
+    public RS loadPonums(){
+        List<String> parts = this.dao.loadPonums();
+        return RS.ok(parts.stream().map(item  ->{
+            Map<String,String> map = new HashMap<>();
+            map.put("value",item);
+            return map;
+        }).collect(Collectors.toList()));
+    }
+
+    @GetMapping("/items")
+    @PreAuthorize("hasAuthority('I-3')")
+    public RS loadItems(){
+        List<String> parts = this.dao.loadItems();
+        return RS.ok(parts.stream().map(item  ->{
+            Map<String,String> map = new HashMap<>();
+            map.put("value",item);
+            return map;
+        }).collect(Collectors.toList()));
+    }
 }
