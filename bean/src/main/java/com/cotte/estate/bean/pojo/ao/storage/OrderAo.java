@@ -42,6 +42,10 @@ public class OrderAo {
 
     private String color;
 
+    private String bake;
+
+    private String bakeId;
+
     private String colorId;
 
     private BigDecimal count;

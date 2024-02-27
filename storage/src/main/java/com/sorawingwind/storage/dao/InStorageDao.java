@@ -29,7 +29,7 @@ public class InStorageDao {
         sb.append("i.color,");
         sb.append("o.color as order_color,");
         sb.append("i.bunch_count,");
-        sb.append("i.bake,");
+        sb.append("o.bake,");
         sb.append("i.in_count,");
         sb.append("i.unit,");
         sb.append("i.incoming_type,");
@@ -108,7 +108,7 @@ public class InStorageDao {
         sb.append("i.color,");
         sb.append("o.color as order_color,");
         sb.append("i.bunch_count,");
-        sb.append("i.bake,");
+        sb.append("o.bake,");
         sb.append("i.in_count,");
         sb.append("i.unit,");
         sb.append("i.incoming_type,");
@@ -176,7 +176,7 @@ public class InStorageDao {
     public List<InStorageEto> getExcels(String customerNameItem, String incomingType, String code, String starttime, String endtime) {
         StringBuffer sql = new StringBuffer();
         sql.append(" select ");
-        sql.append(" i.name, ");
+        sql.append(" o.item as name, ");
         sql.append(" i.bunch_count as bunchCount, ");
         sql.append(" i.bad_reason as badReason, ");
         sql.append(" o.customer_name as customerName, ");

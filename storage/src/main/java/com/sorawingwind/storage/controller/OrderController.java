@@ -56,6 +56,7 @@ public class OrderController {
 
         List<DictDo> customerDicts = this.dictController.getDictDoByType("customer");
         List<DictDo> colorDicts = this.dictController.getDictDoByType("color");
+        List<DictDo> ctDicts = this.dictController.getDictDoByType("ct");
 
         List<OrderAo> listao = new ListUtil<OrderDo, OrderAo>().copyList(list, OrderAo.class);
         List<String> orderIds = listao.stream().map(OrderAo::getId).collect(Collectors.toList());
@@ -72,6 +73,8 @@ public class OrderController {
         for (OrderAo oitem : listao) {
             OrderAo aoInner = new OrderAo();
             BeanUtils.copyProperties(oitem, aoInner);
+            aoInner.setBake(ctDicts.stream().filter(dict -> dict.getId().equals(oitem.getBake())).findFirst().get().getItemName());
+            aoInner.setBakeId(oitem.getBake());
             List<String> inids = listIn.stream().filter(iin -> oitem.getId().equals(iin.getOrderId())).map(InStorageDo::getId).collect(Collectors.toList());
 
             // 出库良品组件数
@@ -155,6 +158,7 @@ public class OrderController {
         BeanUtils.copyProperties(orderAo, doo);
         doo.setCustomerName(orderAo.getCustomerNameId());
         doo.setColor(orderAo.getColorId());
+        doo.setBake(orderAo.getBakeId());
         doo.setModifiedTime(new Date());
         this.dao.update(doo);
         return RS.ok();
@@ -310,7 +314,9 @@ public class OrderController {
 
         //获取数据
         List<OrderDo> listdo = this.dao.getExcels(orderAo.getCustomerNameItem(), orderAo.getCode(), orderAo.getPo(), orderAo.getItem(), orderAo.getStarttime(), orderAo.getEndtime()).stream().map(iitem -> {
+            iitem.setCustomerName(dictController.getById(iitem.getCustomerName()).getItemName());
             iitem.setColor(dictController.getById(iitem.getColor()).getItemName());
+            iitem.setBake(dictController.getById(iitem.getBake()).getItemName());
             return iitem;
         }).collect(Collectors.toList());
         List<OrderEto> listeto = new ListUtil<OrderDo, OrderEto>().copyList(listdo, OrderEto.class);
@@ -356,5 +362,27 @@ public class OrderController {
             map.put("value",item);
             return map;
         }).collect(Collectors.toList()));
+    }
+
+    @GetMapping("/item/parts")
+    @PreAuthorize("hasAuthority('I-3')")
+    public RS loadPonumItems(@RequestParam String item){
+        List<String> parts = this.dao.loadPonumItems(item);
+        return RS.ok(parts.stream().map(it  ->{
+            Map<String,String> map = new HashMap<>();
+            map.put("value",it);
+            return map;
+        }).collect(Collectors.toList()));
+    }
+
+    @GetMapping("/colorPartcount")
+    @PreAuthorize("hasAuthority('I-3')")
+    public RS loadInfoByItemPart(@RequestParam String item,@RequestParam String part){
+        Map<String,String> info = this.dao.loadInfoByItemPart(item,part);
+        if (info == null){
+            return RS.warn("没有相关订单信息");
+        }else{
+            return RS.ok(info);
+        }
     }
 }

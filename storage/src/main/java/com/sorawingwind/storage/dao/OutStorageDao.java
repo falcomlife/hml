@@ -35,7 +35,7 @@ public class OutStorageDao {
         sb.append(" i.code as in_storage_code, ");
         sb.append(" i.name as name, ");
         sb.append(" i.image as image, ");
-        sb.append(" i.bake as bake, ");
+        sb.append(" o.bake as bake, ");
         sb.append(" i.in_count as in_count ");
         sb.append(" from b_out_storage ot ");
         sb.append(" left join b_in_storage i on ot.in_storage_id = i.id");
@@ -117,7 +117,7 @@ public class OutStorageDao {
         sb.append(" i.code as in_storage_code, ");
         sb.append(" i.name as name, ");
         sb.append(" i.image as image, ");
-        sb.append(" i.bake as bake, ");
+        sb.append(" o.bake as bake, ");
         sb.append(" i.in_count as in_count ");
         sb.append(" from b_out_storage ot ");
         sb.append(" left join b_in_storage i on ot.in_storage_id = i.id");

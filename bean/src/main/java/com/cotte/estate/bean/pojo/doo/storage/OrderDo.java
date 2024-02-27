@@ -40,6 +40,8 @@ public class OrderDo {
     private String part;
     @Column(name = "color")
     private String color;
+    @Column(name = "bake")
+    private String bake;
     @Column(name = "count")
     private BigDecimal count;
     @Column(name = "part_sum_count")

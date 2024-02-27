@@ -81,9 +81,9 @@ public class InStorageController {
             aoInner.setIsDelete(0);
             aoInner.setCustomerName(customerDicts.stream().filter(dict -> dict.getId().equals(item.getString("customer_name"))).findFirst().get().getItemName());
             aoInner.setCustomerNameId(item.getString("customer_name"));
-            if (StringUtils.isNotBlank(item.getString("color"))) {
-                aoInner.setColor(colorDicts.stream().filter(dict -> dict.getId().equals(item.getString("color"))).findFirst().get().getItemName());
-            }
+//            if (StringUtils.isNotBlank(item.getString("color"))) {
+//                aoInner.setColor(colorDicts.stream().filter(dict -> dict.getId().equals(item.getString("color"))).findFirst().get().getItemName());
+//            }
             aoInner.setColorId(item.getString("color"));
             aoInner.setOrderColor(colorDicts.stream().filter(dict -> dict.getId().equals(item.getString("order_color"))).findFirst().get().getItemName());
             aoInner.setOrderColorId(item.getString("order_color"));
@@ -138,8 +138,8 @@ public class InStorageController {
             aoInner.setIsDelete(0);
             aoInner.setCustomerName(customerDicts.stream().filter(dict -> dict.getId().equals(item.getString("customer_name"))).findFirst().get().getItemName());
             aoInner.setCustomerNameId(item.getString("customer_name"));
-            aoInner.setColor(colorDicts.stream().filter(dict -> dict.getId().equals(item.getString("color"))).findFirst().get().getItemName());
-            aoInner.setColorId(item.getString("color"));
+//            aoInner.setColor(colorDicts.stream().filter(dict -> dict.getId().equals(item.getString("color"))).findFirst().get().getItemName());
+//            aoInner.setColorId(item.getString("color"));
             aoInner.setOrderColor(colorDicts.stream().filter(dict -> dict.getId().equals(item.getString("order_color"))).findFirst().get().getItemName());
             aoInner.setOrderColorId(item.getString("order_color"));
             aoInner.setIncomingType(incomingtypeDicts.stream().filter(dict -> dict.getId().equals(item.getString("incoming_type"))).findFirst().get().getItemName());
@@ -179,7 +179,6 @@ public class InStorageController {
         InStorageDo doo = new InStorageDo();
         BeanUtils.copyProperties(inStorageAo, doo);
         doo.setColor(inStorageAo.getColorId());
-        doo.setBake(inStorageAo.getBakeId());
         doo.setIncomingType(inStorageAo.getIncomingTypeId());
         doo.setUnit(inStorageAo.getUnitId());
         doo.setModifiedTime(new Date());
@@ -266,10 +265,12 @@ public class InStorageController {
         if (StringUtils.isNotBlank(doo.getCustomerName())) {
             iao.setCustomerName(dictController.getById(doo.getCustomerName()).getItemName());
         }
-        if (StringUtils.isNotBlank(doo.getColor())) {
-            iao.setColor(dictController.getById(doo.getColor()).getItemName());
+//        if (StringUtils.isNotBlank(doo.getColor())) {
+//            iao.setColor(dictController.getById(doo.getColor()).getItemName());
+//        }
+        if (StringUtils.isNotBlank(doo.getBake())) {
+            iao.setBake(dictController.getById(doo.getBake()).getItemName());
         }
-        iao.setBake(dictController.getById(idoo.getBake()).getItemName());
         iao.setCustomerNameId(doo.getCustomerName());
         iao.setPoNum(doo.getPoNum());
         iao.setItem(doo.getItem());
@@ -284,13 +285,11 @@ public class InStorageController {
         return RS.ok(this.dao.getByOrderId(orderId).stream().map(item -> {
             InStorageAo aoInner = new InStorageAo();
             BeanUtils.copyProperties(item, aoInner);
-            aoInner.setColor(dictController.getById(item.getColor()).getItemName());
-            aoInner.setColorId(item.getColor());
+//            aoInner.setColor(dictController.getById(item.getColor()).getItemName());
+//            aoInner.setColorId(item.getColor());
             aoInner.setIncomingType(dictController.getById(item.getIncomingType()).getItemName());
             aoInner.setIncomingTypeId(item.getIncomingType());
             aoInner.setIncomingReason(item.getIncomingReason());
-            aoInner.setBake(dictController.getById(item.getBake()).getItemName());
-            aoInner.setBakeId(item.getBake());
             List<OutStorageAo> list = new ArrayList<>();
             if (StringUtils.isNotBlank(item.getOutStorageId())) {
                 OutStorageAo ao = new OutStorageAo();
@@ -315,13 +314,11 @@ public class InStorageController {
         return RS.ok(this.dao.getByOutStorageId(outStorageId).stream().map(item -> {
             InStorageAo aoInner = new InStorageAo();
             BeanUtils.copyProperties(item, aoInner);
-            aoInner.setColor(dictController.getById(item.getColor()).getItemName());
-            aoInner.setColorId(item.getColor());
+//            aoInner.setColor(dictController.getById(item.getColor()).getItemName());
+//            aoInner.setColorId(item.getColor());
             aoInner.setIncomingType(dictController.getById(item.getIncomingType()).getItemName());
             aoInner.setIncomingTypeId(item.getIncomingType());
             aoInner.setIncomingReason(item.getIncomingReason());
-            aoInner.setBake(dictController.getById(item.getBake()).getItemName());
-            aoInner.setBakeId(item.getBake());
             return aoInner;
         }).collect(Collectors.toList()));
     }

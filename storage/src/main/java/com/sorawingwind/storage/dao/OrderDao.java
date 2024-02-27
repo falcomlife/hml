@@ -9,9 +9,8 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Repository;
 
-import java.util.Collection;
-import java.util.Date;
-import java.util.List;
+import java.math.BigDecimal;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Repository
@@ -138,14 +137,33 @@ public class OrderDao {
     }
 
     public List<String> loadParts() {
-        return Ebean.createQuery(OrderDo.class).findList().stream().map(OrderDo::getPart).filter(item -> StringUtils.isNotBlank(item)).distinct().collect(Collectors.toList());
+        return Ebean.createQuery(OrderDo.class).where().eq("is_delete",false).findList().stream().map(OrderDo::getPart).filter(item -> StringUtils.isNotBlank(item)).distinct().collect(Collectors.toList());
     }
 
     public List<String> loadPonums() {
-        return Ebean.createQuery(OrderDo.class).findList().stream().map(OrderDo::getPoNum).filter(item -> StringUtils.isNotBlank(item)).distinct().collect(Collectors.toList());
+        return Ebean.createQuery(OrderDo.class).where().eq("is_delete",false).findList().stream().map(OrderDo::getPoNum).filter(item -> StringUtils.isNotBlank(item)).distinct().collect(Collectors.toList());
     }
 
     public List<String> loadItems() {
-        return Ebean.createQuery(OrderDo.class).findList().stream().map(OrderDo::getItem).filter(item -> StringUtils.isNotBlank(item)).distinct().collect(Collectors.toList());
+        return Ebean.createQuery(OrderDo.class).where().eq("is_delete",false).findList().stream().map(OrderDo::getItem).filter(item -> StringUtils.isNotBlank(item)).distinct().collect(Collectors.toList());
+    }
+
+    public List<String> loadPonumItems(String item) {
+        List<OrderDo> orders = Ebean.createQuery(OrderDo.class).where().eq("item",item).eq("is_delete",false).findList();
+        return orders.stream().map(OrderDo::getPart).filter(i -> StringUtils.isNotBlank(i)).distinct().collect(Collectors.toList());
+    }
+
+    public Map<String,String> loadInfoByItemPart(String item, String part) {
+        List<OrderDo> orderDos = Ebean.createQuery(OrderDo.class).where().eq("item",item).eq("part",part).eq("is_delete",false).findList();
+        OrderDo doo = null;
+        if (orderDos!=null && !orderDos.isEmpty()){
+             doo = orderDos.get(0);
+             Map<String,String> map = new HashMap<>();
+             map.put("colorId",doo.getColor());
+             map.put("partCount",doo.getPartSumCount().divide(doo.getCount(),0, BigDecimal.ROUND_HALF_UP).toString());
+             return map;
+        }else{
+            return null;
+        }
     }
 }

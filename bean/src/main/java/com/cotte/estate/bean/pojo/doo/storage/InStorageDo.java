@@ -40,8 +40,6 @@ public class InStorageDo {
     private BigDecimal bunchCount;
     @Column(name = "unit")
     private String unit;
-    @Column(name = "bake")
-    private String bake;
     @Column(name = "in_count")
     private String inCount;
     @Column(name = "color")
