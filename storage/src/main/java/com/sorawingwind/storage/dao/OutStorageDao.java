@@ -1,14 +1,18 @@
 package com.sorawingwind.storage.dao;
 
+import com.cotte.estate.bean.pojo.ao.storage.OutStorageAo;
 import com.cotte.estate.bean.pojo.doo.storage.OutStorageDo;
+import com.cotte.estatecommon.enums.OutType;
 import io.ebean.Ebean;
 import io.ebean.SqlQuery;
 import io.ebean.SqlRow;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Repository;
 
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Repository
 public class OutStorageDao {
@@ -141,5 +145,75 @@ public class OutStorageDao {
 
     public List<OutStorageDo> getById(String outStorageId) {
         return Ebean.createQuery(OutStorageDo.class).where().eq("is_delete", 0).eq("id", outStorageId).findList();
+    }
+
+    public List<OutStorageAo> getExcels(String customerNameItem, String code, String starttime, String endtime) {
+        StringBuffer sb = new StringBuffer();
+        sb.append(" select ");
+        sb.append(" ot.id, ");
+        sb.append(" ot.in_storage_id, ");
+        sb.append(" ot.bunch_count, ");
+        sb.append(" ot.out_count, ");
+        sb.append(" ot.code, ");
+        sb.append(" ot.out_type, ");
+        sb.append(" ot.create_time, ");
+        sb.append(" ot.modified_time, ");
+        sb.append(" ot.is_delete, ");
+        sb.append(" o.customer_name, ");
+        sb.append(" o.po_num, ");
+        sb.append(" o.item, ");
+        sb.append(" o.part, ");
+        sb.append(" o.color, ");
+        sb.append(" o.count, ");
+        sb.append(" o.code as order_code, ");
+        sb.append(" i.code as in_storage_code, ");
+        sb.append(" i.name as name, ");
+        sb.append(" i.image as image, ");
+        sb.append(" o.bake as bake, ");
+        sb.append(" i.in_count as in_count ");
+        sb.append(" from b_out_storage ot ");
+        sb.append(" left join b_in_storage i on ot.in_storage_id = i.id");
+        sb.append(" left join `b_order` o on o.id = i.order_id");
+        sb.append(" where ot.is_delete = 0 ");
+        if (StringUtils.isNotBlank(customerNameItem)) {
+            sb.append(" and o.customer_name = :customerNameItem ");
+        }
+        if (StringUtils.isNotBlank(starttime)) {
+            sb.append(" and ot.create_time >= :starttime ");
+        }
+        if (StringUtils.isNotBlank(endtime)) {
+            sb.append(" and ot.create_time <= :endtime ");
+        }
+        if (StringUtils.isNotBlank(code)) {
+            sb.append(" and ot.code like '%" + code + "%' ");
+        }
+        sb.append("order by ot.create_time desc");
+        SqlQuery sq = Ebean.createSqlQuery(sb.toString()).setParameter("customerNameItem", customerNameItem).setParameter("customer_name_item", customerNameItem).setParameter("starttime", starttime).setParameter("endtime", endtime);
+        List<SqlRow> list = sq.findList();
+        List<OutStorageAo> listaor = list.stream().map(item -> {
+            OutStorageAo aoInner = new OutStorageAo();
+            aoInner.setId(item.getString("id"));
+            aoInner.setInStorageId(item.getString("in_storage_id"));
+            aoInner.setInStorageCode(item.getString("in_storage_code"));
+            aoInner.setCode(item.getString("code"));
+            aoInner.setBunchCount(item.getBigDecimal("bunch_count"));
+            aoInner.setCreateTime(item.getDate("create_time"));
+            aoInner.setImage(item.getString("image"));
+            aoInner.setOutCount(item.getString("out_count"));
+            aoInner.setName(item.getString("name"));
+            aoInner.setPoNum(item.getString("po_num"));
+            aoInner.setItem(item.getString("item"));
+            aoInner.setPart(item.getString("part"));
+            aoInner.setCount(item.getString("count"));
+            aoInner.setIsDelete(0);
+            aoInner.setCustomerName(item.getString("customer_name"));
+            aoInner.setColor(item.getString("color"));
+            aoInner.setBake(item.getString("bake"));
+            aoInner.setOutTypeId(item.getString("out_type"));
+            aoInner.setOutType(OutType.getNameByIndex(Integer.parseInt(item.getString("out_type"))));
+            aoInner.setInCount(item.getString("in_count"));
+            return aoInner;
+        }).collect(Collectors.toList());
+        return listaor;
     }
 }

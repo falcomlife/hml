@@ -58,6 +58,9 @@ public class OrderAo {
 
     private BigDecimal outStroageSumCount;
 
+    //组件总数-已出库良品组件总数
+    private Integer partSumCountSubOutStroageGoodsSumCount;
+
     private BigDecimal price;
 
     private BigDecimal sum;

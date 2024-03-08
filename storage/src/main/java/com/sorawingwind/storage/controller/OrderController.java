@@ -119,6 +119,9 @@ public class OrderController {
             aoInner.setReplatCount(replat);
             aoInner.setIncomingCount(incomingErr);
             aoInner.setOutStroageGoodsSumCount(outStorageSumGood);
+            if(aoInner.getPartSumCount()!=null){
+                aoInner.setPartSumCountSubOutStroageGoodsSumCount((aoInner.getPartSumCount().subtract(new BigDecimal(outStorageSumGood))).intValue());
+            }
             aoInner.setPartSumCountCal(inStorageSumCountCal);
             if(StringUtils.isNotBlank(oitem.getCustomerName())) {
                 aoInner.setCustomerName(customerDicts.stream().filter(dict -> dict.getId().equals(oitem.getCustomerName())).findFirst().get().getItemName());

@@ -1,11 +1,20 @@
 package com.sorawingwind.storage.controller;
 
+import com.alibaba.excel.EasyExcel;
+import com.alibaba.excel.ExcelWriter;
+import com.alibaba.excel.write.metadata.WriteSheet;
+import com.cotte.estate.bean.pojo.ao.storage.OrderExcelAo;
 import com.cotte.estate.bean.pojo.ao.storage.OutStorageAo;
+import com.cotte.estate.bean.pojo.ao.storage.OutStorageExcelAo;
 import com.cotte.estate.bean.pojo.doo.storage.DictDo;
+import com.cotte.estate.bean.pojo.doo.storage.OrderDo;
 import com.cotte.estate.bean.pojo.doo.storage.OutStorageDo;
+import com.cotte.estate.bean.pojo.eto.OrderEto;
+import com.cotte.estate.bean.pojo.eto.OutStorageEto;
 import com.cotte.estatecommon.PageRS;
 import com.cotte.estatecommon.RS;
 import com.cotte.estatecommon.utils.CodeGenerUtil;
+import com.cotte.estatecommon.utils.ListUtil;
 import com.cotte.estatecommon.utils.UUIDUtil;
 import com.cotte.estatecommon.enums.OutType;
 import com.sorawingwind.storage.dao.OutStorageDao;
@@ -20,8 +29,12 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.servlet.http.HttpServletResponse;
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.net.URLEncoder;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -158,5 +171,34 @@ public class OutStorageController {
             aoInner.setOutType(OutType.getNameByIndex(Integer.parseInt(item.getOutType())));
             return aoInner;
         }).collect(Collectors.toList()));
+    }
+    @PostMapping("/excel")
+    @PreAuthorize("hasAuthority('I-4')")
+    public void download(HttpServletResponse response, @RequestBody OutStorageExcelAo outStorageExcelAo) throws Exception {
+        response.setContentType("application/vnd.ms-excel");
+        response.setCharacterEncoding("utf-8");
+        String fileName = URLEncoder.encode("出库明细", "UTF-8");
+        response.setHeader("Access-Control-Expose-Headers", "Content-Disposition");
+        response.setHeader("Content-disposition", "attachment;filename=" + fileName + ".xlsx;" + "filename*=utf-8''" + fileName + ".xlsx");
+        OutputStream outputStream = response.getOutputStream();
+        //FileOutputStream outputStream = new FileOutputStream("/home/sorawingwind/桌面/xx.xlsx");
+
+        //获取数据
+        List<OutStorageAo> listdo = this.dao.getExcels(outStorageExcelAo.getCustomerNameItem(), outStorageExcelAo.getCode(), outStorageExcelAo.getStarttime(), outStorageExcelAo.getEndtime()).stream().map(iitem -> {
+            iitem.setCustomerName(dictController.getById(iitem.getCustomerName()).getItemName());
+            iitem.setColor(dictController.getById(iitem.getColor()).getItemName());
+            iitem.setBake(dictController.getById(iitem.getBake()).getItemName());
+            return iitem;
+        }).collect(Collectors.toList());
+        List<OutStorageEto> listeto = new ListUtil<OutStorageAo, OutStorageEto>().copyList(listdo, OutStorageEto.class);
+        // 获取模板路径
+        InputStream resourceAsStream = this.getClass().getResourceAsStream("/excel/outStorage.xlsx");
+        // 创建输出的excel对象
+        final ExcelWriter write = EasyExcel.write(outputStream).withTemplate(resourceAsStream).build();
+        // 创建第一个sheel页
+        final WriteSheet sheet1 = EasyExcel.writerSheet(0, "出库明细").build();
+        write.fill(listeto, sheet1);
+        // 关闭流
+        write.finish();
     }
 }
