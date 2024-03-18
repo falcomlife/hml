@@ -17,4 +17,6 @@ public class OutStorageEto {
     private String bake;
     private String inCount;
     private BigDecimal bunchCount;
+    private Integer leftPartSumCount;
+    private String outType;
 }

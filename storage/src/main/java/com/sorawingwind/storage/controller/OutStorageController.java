@@ -188,6 +188,10 @@ public class OutStorageController {
             iitem.setCustomerName(dictController.getById(iitem.getCustomerName()).getItemName());
             iitem.setColor(dictController.getById(iitem.getColor()).getItemName());
             iitem.setBake(dictController.getById(iitem.getBake()).getItemName());
+            if(iitem.getOrderPartSumCount()!= null){
+                int outSumBunchCount = this.dao.getSumBunchCount(iitem.getOrderId());
+                iitem.setLeftPartSumCount(iitem.getOrderPartSumCount() - outSumBunchCount);
+            }
             return iitem;
         }).collect(Collectors.toList());
         List<OutStorageEto> listeto = new ListUtil<OutStorageAo, OutStorageEto>().copyList(listdo, OutStorageEto.class);

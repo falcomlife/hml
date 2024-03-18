@@ -1,7 +1,7 @@
 package com.cotte.estatecommon.enums;
 
 public enum OutType {
-    GOOD("良品", 1), POOR("不良", 2), INSTORAGEERR("来料异常", 3), PLATINUM("白金出库", 4), CUSO4("硫酸铜出库", 5),RETURN("返回挑面", 7), OTHER("其他", 6);
+    GOOD("良品", 1), POOR("不良", 2), INSTORAGEERR("来料异常", 3), PLATINUM("白金出库", 4), CUSO4("硫酸铜出库", 5), RETURN("返回挑面", 7),CHECKBAD("检查面不良返镀", 8),PLATING("镀金不良返镀", 9), ELECTRICITY("电烤厅", 10),GLOD("检查完加金", 11), OTHER("其他", 6);
 
     private String name;
     private int index;
@@ -39,6 +39,14 @@ public enum OutType {
             return OutType.CUSO4.getName();
         } else if (index == OutType.RETURN.getIndex()) {
             return OutType.RETURN.getName();
+        } else if (index == OutType.CHECKBAD.getIndex()) {
+            return OutType.CHECKBAD.getName();
+        } else if (index == OutType.PLATING.getIndex()) {
+            return OutType.PLATING.getName();
+        } else if (index == OutType.ELECTRICITY.getIndex()) {
+            return OutType.ELECTRICITY.getName();
+        } else if (index == OutType.GLOD.getIndex()) {
+            return OutType.GLOD.getName();
         } else {
             return OutType.OTHER.getName();
         }

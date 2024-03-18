@@ -76,10 +76,10 @@ public class OutStorageDao {
             sb.append(" and o.customer_name = :customerNameItem ");
         }
         if (StringUtils.isNotBlank(starttime)) {
-            sb.append(" and i.create_time >= :starttime ");
+            sb.append(" and ot.create_time >= :starttime ");
         }
         if (StringUtils.isNotBlank(endtime)) {
-            sb.append(" and i.create_time <= :endtime ");
+            sb.append(" and ot.create_time <= :endtime ");
         }
         if (StringUtils.isNotBlank(code)) {
             sb.append(" and ot.code like '%" + code + "%' ");
@@ -159,12 +159,14 @@ public class OutStorageDao {
         sb.append(" ot.create_time, ");
         sb.append(" ot.modified_time, ");
         sb.append(" ot.is_delete, ");
+        sb.append(" i.order_id as order_id, ");
         sb.append(" o.customer_name, ");
         sb.append(" o.po_num, ");
         sb.append(" o.item, ");
         sb.append(" o.part, ");
         sb.append(" o.color, ");
         sb.append(" o.count, ");
+        sb.append(" o.part_sum_count, ");
         sb.append(" o.code as order_code, ");
         sb.append(" i.code as in_storage_code, ");
         sb.append(" i.name as name, ");
@@ -193,6 +195,8 @@ public class OutStorageDao {
         List<OutStorageAo> listaor = list.stream().map(item -> {
             OutStorageAo aoInner = new OutStorageAo();
             aoInner.setId(item.getString("id"));
+            aoInner.setOrderId(item.getString("order_id"));
+            aoInner.setOrderPartSumCount(item.getBigDecimal("part_sum_count")==null?null:item.getBigDecimal("part_sum_count").intValue());
             aoInner.setInStorageId(item.getString("in_storage_id"));
             aoInner.setInStorageCode(item.getString("in_storage_code"));
             aoInner.setCode(item.getString("code"));
@@ -215,5 +219,18 @@ public class OutStorageDao {
             return aoInner;
         }).collect(Collectors.toList());
         return listaor;
+    }
+
+    public Integer getSumBunchCount(String orderId){
+        StringBuffer sb = new StringBuffer();
+        sb.append(" select ");
+        sb.append(" sum(ot.bunch_count) ");
+        sb.append(" from b_out_storage ot ");
+        sb.append(" left join b_in_storage i on ot.in_storage_id = i.id");
+        sb.append(" left join `b_order` o on o.id = i.order_id");
+        sb.append(" where ot.is_delete = 0 and o.id = :orderId ");
+        SqlQuery sq = Ebean.createSqlQuery(sb.toString()).setParameter("orderId", orderId);
+        SqlRow result = sq.findOne();
+        return 1;
     }
 }

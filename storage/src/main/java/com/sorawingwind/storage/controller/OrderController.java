@@ -81,9 +81,9 @@ public class OrderController {
             int outStorageSumGood = listOut.stream().filter(oin -> inids.contains(oin.getInStorageId())).filter(oin->(OutType.GOOD.getIndex()+"").equals(oin.getOutType())).mapToInt(oin->oin.getBunchCount().intValue()).sum();
             // 入库不良品组件数
             //int incomingPoor = listOut.stream().filter(oin -> inids.contains(oin.getInStorageId())).filter(oin -> (OutType.POOR.getIndex() + "").equals(oin.getOutType())).mapToInt(oin -> oin.getBunchCount().intValue()).sum();
-            int incomingPoor = listIn.stream().filter(iin -> inids.contains(iin.getId())).filter(iin -> "30bc0ec552cb4a59a23c680362219ecf".equals(iin.getIncomingType())).filter(iin -> (InUnit.ONE.getIndex() + "").equals(iin.getUnit())).mapToInt(iin -> iin.getBunchCount().intValue()).sum();
+            //int incomingPoor = listIn.stream().filter(iin -> inids.contains(iin.getId())).filter(iin -> "30bc0ec552cb4a59a23c680362219ecf".equals(iin.getIncomingType())).filter(iin -> (InUnit.ONE.getIndex() + "").equals(iin.getUnit())).mapToInt(iin -> iin.getBunchCount().intValue()).sum();
             // 已出库良品组件总数 = 出库良品组件数 - 入库不良品组件数
-            outStorageSumGood = outStorageSumGood - incomingPoor;
+            //outStorageSumGood = outStorageSumGood - incomingPoor;
             if(aoInner.getPartSumCount()!=null){
                 // 已出库良品组件总数 > 订单组件总数,已出库良品组件总数显示红色
                 aoInner.setOutStorageBigger(aoInner.getPartSumCount().compareTo(new BigDecimal(outStorageSumGood)) == -1);

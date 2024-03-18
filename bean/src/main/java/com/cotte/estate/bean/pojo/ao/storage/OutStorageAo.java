@@ -26,6 +26,12 @@ public class OutStorageAo {
     @GeneratedValue(generator="uuidGenerator")
     private String id;
 
+    private String orderId;
+
+    private Integer orderPartSumCount;
+
+    private Integer leftPartSumCount;
+
     private String inStorageId;
 
     private String inStorageCode;
