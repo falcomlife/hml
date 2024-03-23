@@ -95,11 +95,11 @@ public class OrderDao {
     }
 
     public List<SqlRow> getCountBetweenTimesWithColor(String startStr, String endStr) {
-        return Ebean.createSqlQuery("select color,sum( `sum` ) as count from `b_order` where sum is not null and create_time >= :start and create_time <= :end and is_delete = 0 GROUP BY color order by count asc").setParameter("start", startStr).setParameter("end", endStr).findList();
+        return Ebean.createSqlQuery("select color,sum( `part_sum_count` ) as count from `b_order` where sum is not null and create_time >= :start and create_time <= :end and is_delete = 0 GROUP BY color order by count asc").setParameter("start", startStr).setParameter("end", endStr).findList();
     }
 
     public List<SqlRow> getCountBetweenTimesWithCustomer(String startStr, String endStr) {
-        return Ebean.createSqlQuery("select customer_name,sum( `sum` ) as count from `b_order` where sum is not null and create_time >= :start and create_time <= :end and is_delete = 0 GROUP BY customer_name order by count desc").setParameter("start", startStr).setParameter("end", endStr).findList();
+        return Ebean.createSqlQuery("select customer_name,sum( `part_sum_count` ) as count from `b_order` where sum is not null and create_time >= :start and create_time <= :end and is_delete = 0 GROUP BY customer_name order by count desc").setParameter("start", startStr).setParameter("end", endStr).findList();
     }
 
     public List<OrderDo> getByCode(String code) {

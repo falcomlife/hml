@@ -89,7 +89,6 @@ public class OrderController {
                 aoInner.setOutStorageBigger(aoInner.getPartSumCount().compareTo(new BigDecimal(outStorageSumGood)) == -1);
             }
 
-
             // 入库新件，只统计单位是个的数量
             int inStorageNew = listIn.stream().filter(iin -> inids.contains(iin.getId())).filter(iin -> "4".equals(iin.getIncomingType())).filter(iin -> (InUnit.ONE.getIndex() + "").equals(iin.getUnit())).mapToInt(iin -> iin.getBunchCount().intValue()).sum();
             // 入库返镀件，只统计单位是个的数量
@@ -100,7 +99,6 @@ public class OrderController {
                 // 已入库组件总数 > 订单组件总数，已入库组件总数显示红色
                 aoInner.setIncomingBigger(aoInner.getPartSumCount().compareTo(new BigDecimal(inStorageSumCountCal)) == -1);
             }
-
 
             // 入库返镀件组件数量，只统计单位是个的数量
             int replat = listIn.stream().filter(iin -> inids.contains(iin.getId())).filter(iin -> "5".equals(iin.getIncomingType())).filter(iin -> (InUnit.ONE.getIndex() + "").equals(iin.getUnit())).mapToInt(iin -> iin.getBunchCount().intValue()).sum();
@@ -119,8 +117,16 @@ public class OrderController {
             aoInner.setReplatCount(replat);
             aoInner.setIncomingCount(incomingErr);
             aoInner.setOutStroageGoodsSumCount(outStorageSumGood);
+            BigDecimal partSumCountSubOutStroageGoodsSumCount = BigDecimal.ZERO;
             if(aoInner.getPartSumCount()!=null){
-                aoInner.setPartSumCountSubOutStroageGoodsSumCount((aoInner.getPartSumCount().subtract(new BigDecimal(outStorageSumGood))).intValue());
+                partSumCountSubOutStroageGoodsSumCount = (aoInner.getPartSumCount().subtract(new BigDecimal(outStorageSumGood)));
+                if(partSumCountSubOutStroageGoodsSumCount.compareTo(BigDecimal.ZERO)<=0){
+                    aoInner.setPartSumCountSubOutStroageGoodsSumCount(0);
+                    aoInner.setOverPartSumCount(partSumCountSubOutStroageGoodsSumCount.abs().intValue());
+                }else{
+                    aoInner.setPartSumCountSubOutStroageGoodsSumCount(partSumCountSubOutStroageGoodsSumCount.intValue());
+                    aoInner.setOverPartSumCount(0);
+                }
             }
             aoInner.setPartSumCountCal(inStorageSumCountCal);
             if(StringUtils.isNotBlank(oitem.getCustomerName())) {
@@ -276,7 +282,7 @@ public class OrderController {
             // 创建输出的excel对象
             final ExcelWriter write = EasyExcel.write(outputStream).withTemplate(resourceAsStream).build();
             // 创建第一个sheel页
-            final WriteSheet sheet1 = EasyExcel.writerSheet(0, "月客户金额明细").build();
+            final WriteSheet sheet1 = EasyExcel.writerSheet(0, "月客户组件数明细").build();
             write.fill(listeto, sheet1);
             // 关闭流
             write.finish();
@@ -314,22 +320,66 @@ public class OrderController {
         response.setHeader("Content-disposition", "attachment;filename=" + fileName + ".xlsx;" + "filename*=utf-8''" + fileName + ".xlsx");
         OutputStream outputStream = response.getOutputStream();
         //FileOutputStream outputStream = new FileOutputStream("/home/sorawingwind/桌面/xx.xlsx");
-
+        List<OrderDo> listdoOri = this.dao.getExcels(orderAo.getCustomerNameItem(), orderAo.getCode(), orderAo.getPo(), orderAo.getItem(), orderAo.getStarttime(), orderAo.getEndtime());
+        List<String> orderIds = listdoOri.stream().map(OrderDo::getId).collect(Collectors.toList());
+        List<InStorageDo> listIn;
+        List<OutStorageDo> listOut;
+        if (!orderIds.isEmpty()) {
+            listIn = Ebean.createQuery(InStorageDo.class).where().in("order_id", orderIds).eq("is_delete", 0).findList();
+            List<String> inStorageIds = listIn.stream().map(InStorageDo::getId).collect(Collectors.toList());
+            if (!listIn.isEmpty()) {
+                listOut = Ebean.createQuery(OutStorageDo.class).where().in("in_storage_id", inStorageIds).eq("is_delete", 0).findList();
+            } else {
+                listOut = new ArrayList<>();
+            }
+        } else {
+            listOut = new ArrayList<>();
+            listIn = new ArrayList<>();
+        }
         //获取数据
-        List<OrderDo> listdo = this.dao.getExcels(orderAo.getCustomerNameItem(), orderAo.getCode(), orderAo.getPo(), orderAo.getItem(), orderAo.getStarttime(), orderAo.getEndtime()).stream().map(iitem -> {
-            iitem.setCustomerName(dictController.getById(iitem.getCustomerName()).getItemName());
-            iitem.setColor(dictController.getById(iitem.getColor()).getItemName());
-            iitem.setBake(dictController.getById(iitem.getBake()).getItemName());
-            return iitem;
+        List<OrderAo> listdo = listdoOri.stream().map(iitem -> {
+            OrderAo ao = new OrderAo();
+            BeanUtils.copyProperties(iitem,ao);
+            ao.setCustomerName(dictController.getById(iitem.getCustomerName()).getItemName());
+            ao.setColor(dictController.getById(iitem.getColor()).getItemName());
+            ao.setBake(dictController.getById(iitem.getBake()).getItemName());
+            List<String> inids = listIn.stream().filter(iin -> iitem.getId().equals(iin.getOrderId())).map(InStorageDo::getId).collect(Collectors.toList());
+            // 入库新件，只统计单位是个的数量
+            int inStorageNew = listIn.stream().filter(iin -> inids.contains(iin.getId())).filter(iin -> "4".equals(iin.getIncomingType())).filter(iin -> (InUnit.ONE.getIndex() + "").equals(iin.getUnit())).mapToInt(iin -> iin.getBunchCount().intValue()).sum();
+            // 入库返镀件，只统计单位是个的数量
+            int inStorageReplat = listIn.stream().filter(iin -> inids.contains(iin.getId())).filter(iin -> "5".equals(iin.getIncomingType())).filter(iin -> (InUnit.ONE.getIndex() + "").equals(iin.getUnit())).mapToInt(iin -> iin.getBunchCount().intValue()).sum();
+            // 已入库组件总数 = 入库新件 + 入库返镀件
+            int inStorageSumCountCal = inStorageNew + inStorageReplat;
+            // 出库良品组件数
+            int outStorageSumGood = listOut.stream().filter(oin -> inids.contains(oin.getInStorageId())).filter(oin->(OutType.GOOD.getIndex()+"").equals(oin.getOutType())).mapToInt(oin->oin.getBunchCount().intValue()).sum();
+            ao.setPartSumCountCal(inStorageSumCountCal);
+            ao.setOutStroageGoodsSumCount(outStorageSumGood);
+            BigDecimal partSumCountSubOutStroageGoodsSumCount = BigDecimal.ZERO;
+            if(ao.getPartSumCount()!=null){
+                partSumCountSubOutStroageGoodsSumCount = (ao.getPartSumCount().subtract(new BigDecimal(outStorageSumGood)));
+                if(partSumCountSubOutStroageGoodsSumCount.compareTo(BigDecimal.ZERO)<=0){
+                    ao.setPartSumCountSubOutStroageGoodsSumCount(0);
+                    ao.setOverPartSumCount(partSumCountSubOutStroageGoodsSumCount.abs().intValue());
+                }else{
+                    ao.setPartSumCountSubOutStroageGoodsSumCount(partSumCountSubOutStroageGoodsSumCount.intValue());
+                    ao.setOverPartSumCount(0);
+                }
+            }
+            return ao;
         }).collect(Collectors.toList());
-        List<OrderEto> listeto = new ListUtil<OrderDo, OrderEto>().copyList(listdo, OrderEto.class);
+
+
+        List<OrderEto> list = new ListUtil<OrderAo, OrderEto>().copyList(listdo, OrderEto.class);
+        list.forEach(item->{
+            item.setTime((StringUtils.isBlank(orderAo.getStarttime())?"开始":orderAo.getStarttime()) + " - "+(StringUtils.isBlank(orderAo.getEndtime())?"结束":orderAo.getEndtime()));
+        });
         // 获取模板路径
         InputStream resourceAsStream = this.getClass().getResourceAsStream("/excel/order.xlsx");
         // 创建输出的excel对象
         final ExcelWriter write = EasyExcel.write(outputStream).withTemplate(resourceAsStream).build();
         // 创建第一个sheel页
         final WriteSheet sheet1 = EasyExcel.writerSheet(0, "订单明细").build();
-        write.fill(listeto, sheet1);
+        write.fill(list, sheet1);
         // 关闭流
         write.finish();
     }

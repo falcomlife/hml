@@ -60,6 +60,8 @@ public class OrderAo {
 
     //组件总数-已出库良品组件总数
     private Integer partSumCountSubOutStroageGoodsSumCount;
+    //出库组件超过订单组件的数量
+    private Integer overPartSumCount;
 
     private BigDecimal price;
 
