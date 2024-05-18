@@ -7,6 +7,7 @@ import com.cotte.estate.bean.pojo.ao.storage.OrderExcelAo;
 import com.cotte.estate.bean.pojo.ao.storage.OutStorageAo;
 import com.cotte.estate.bean.pojo.ao.storage.OutStorageExcelAo;
 import com.cotte.estate.bean.pojo.doo.storage.DictDo;
+import com.cotte.estate.bean.pojo.doo.storage.InStorageDo;
 import com.cotte.estate.bean.pojo.doo.storage.OrderDo;
 import com.cotte.estate.bean.pojo.doo.storage.OutStorageDo;
 import com.cotte.estate.bean.pojo.eto.OrderEto;
@@ -17,6 +18,8 @@ import com.cotte.estatecommon.utils.CodeGenerUtil;
 import com.cotte.estatecommon.utils.ListUtil;
 import com.cotte.estatecommon.utils.UUIDUtil;
 import com.cotte.estatecommon.enums.OutType;
+import com.sorawingwind.storage.dao.InStorageDao;
+import com.sorawingwind.storage.dao.OrderDao;
 import com.sorawingwind.storage.dao.OutStorageDao;
 import io.ebean.Ebean;
 import io.ebean.SqlQuery;
@@ -25,6 +28,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.annotation.Order;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -35,6 +39,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.URLEncoder;
+import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -45,45 +50,50 @@ public class OutStorageController {
     @Autowired
     private OutStorageDao dao;
     @Autowired
+    private InStorageDao inStorageDao;
+    @Autowired
+    private OrderDao orderDao;
+    @Autowired
     private DictController dictController;
     @Value("${project.file.path}")
     private String path;
 
     @GetMapping
     @PreAuthorize("hasAuthority('I-4')")
-    public RS getByPage(@RequestParam int pageIndex, @RequestParam int pageSize, @RequestParam(required = false) String customerNameItem, @RequestParam(required = false) String code, @RequestParam(required = false) String starttime, @RequestParam(required = false) String endtime) {
-        List<SqlRow> list = this.dao.getByPage(pageIndex, pageSize,customerNameItem,code, starttime, endtime);
-        Integer totleRowCount = this.dao.getCountByPage(pageIndex, pageSize,customerNameItem,code, starttime, endtime);
+    public RS getByPage(@RequestParam int pageIndex, @RequestParam int pageSize, @RequestParam(required = false) String customerNameItem, @RequestParam(required = false) String item, @RequestParam(required = false) String poNum, @RequestParam(required = false) String code, @RequestParam(required = false) String starttime, @RequestParam(required = false) String endtime) {
+        List<SqlRow> list = this.dao.getByPage(pageIndex, pageSize, customerNameItem, item, poNum, code, starttime, endtime);
+        Integer totleRowCount = this.dao.getCountByPage(pageIndex, pageSize, customerNameItem, item, poNum, code, starttime, endtime);
 
         List<DictDo> customerDicts = this.dictController.getDictDoByType("customer");
         List<DictDo> colorDicts = this.dictController.getDictDoByType("color");
         List<DictDo> ctDicts = this.dictController.getDictDoByType("ct");
 
-        List<OutStorageAo> listaor = list.stream().map(item -> {
+        List<OutStorageAo> listaor = list.stream().map(itemInner -> {
             OutStorageAo aoInner = new OutStorageAo();
-            aoInner.setId(item.getString("id"));
-            aoInner.setInStorageId(item.getString("in_storage_id"));
-            aoInner.setInStorageCode(item.getString("in_storage_code"));
-            aoInner.setCode(item.getString("code"));
-            aoInner.setBunchCount(item.getBigDecimal("bunch_count"));
-            aoInner.setCreateTime(item.getDate("create_time"));
-            aoInner.setImage(item.getString("image"));
-            aoInner.setOutCount(item.getString("out_count"));
-            aoInner.setName(item.getString("name"));
-            aoInner.setPoNum(item.getString("po_num"));
-            aoInner.setItem(item.getString("item"));
-            aoInner.setPart(item.getString("part"));
-            aoInner.setCount(item.getString("count"));
+            aoInner.setId(itemInner.getString("id"));
+            aoInner.setInStorageId(itemInner.getString("in_storage_id"));
+            aoInner.setInStorageCode(itemInner.getString("in_storage_code"));
+            aoInner.setCode(itemInner.getString("code"));
+            aoInner.setBunchCount(itemInner.getBigDecimal("bunch_count"));
+            aoInner.setCreateTime(itemInner.getDate("create_time"));
+            aoInner.setImage(itemInner.getString("image"));
+            aoInner.setOutCount(itemInner.getString("out_count"));
+            aoInner.setName(itemInner.getString("name"));
+            aoInner.setPoNum(itemInner.getString("po_num"));
+            aoInner.setItem(itemInner.getString("item"));
+            aoInner.setPart(itemInner.getString("part"));
+            aoInner.setCount(itemInner.getString("count"));
+            aoInner.setPartSumCount(itemInner.getBigDecimal("part_sum_count"));
             aoInner.setIsDelete(0);
-            aoInner.setCustomerName(customerDicts.stream().filter(dict -> dict.getId().equals(item.getString("customer_name"))).findFirst().get().getItemName());
-            aoInner.setCustomerNameId(item.getString("customer_name"));
-            aoInner.setColor(colorDicts.stream().filter(dict -> dict.getId().equals(item.getString("color"))).findFirst().get().getItemName());
-            aoInner.setColorId(item.getString("color"));
-            aoInner.setBake(ctDicts.stream().filter(dict -> dict.getId().equals(item.getString("bake"))).findFirst().get().getItemName());
-            aoInner.setBakeId(item.getString("bake"));
-            aoInner.setOutTypeId(item.getString("out_type"));
-            aoInner.setOutType(OutType.getNameByIndex(Integer.parseInt(item.getString("out_type"))));
-            aoInner.setInCount(item.getString("in_count"));
+            aoInner.setCustomerName(customerDicts.stream().filter(dict -> dict.getId().equals(itemInner.getString("customer_name"))).findFirst().get().getItemName());
+            aoInner.setCustomerNameId(itemInner.getString("customer_name"));
+            aoInner.setColor(colorDicts.stream().filter(dict -> dict.getId().equals(itemInner.getString("color"))).findFirst().get().getItemName());
+            aoInner.setColorId(itemInner.getString("color"));
+            aoInner.setBake(ctDicts.stream().filter(dict -> dict.getId().equals(itemInner.getString("bake"))).findFirst().get().getItemName());
+            aoInner.setBakeId(itemInner.getString("bake"));
+            aoInner.setOutTypeId(itemInner.getString("out_type"));
+            aoInner.setOutType(OutType.getNameByIndex(Integer.parseInt(itemInner.getString("out_type"))));
+            aoInner.setInCount(itemInner.getString("in_count"));
             return aoInner;
         }).collect(Collectors.toList());
         return RS.ok(new PageRS<>(pageSize, pageIndex, totleRowCount, totleRowCount / pageSize, listaor));
@@ -141,8 +151,8 @@ public class OutStorageController {
 
     @GetMapping("/code")
     @PreAuthorize("hasAuthority('I-4')")
-    public RS getByCode(@RequestParam(required = false) String code,@RequestParam(required = false) String orderId,@RequestParam(required = false) String item) {
-        List<Map<String, String>> listaor = this.dao.getByCode(code,orderId,item).stream().map(iitem -> {
+    public RS getByCode(@RequestParam(required = false) String code, @RequestParam(required = false) String orderId, @RequestParam(required = false) String item) {
+        List<Map<String, String>> listaor = this.dao.getByCode(code, orderId, item).stream().map(iitem -> {
             Map<String, String> map = new HashMap<>();
             map.put("label", iitem.getString("code"));
             map.put("value", iitem.getString("id"));
@@ -153,25 +163,48 @@ public class OutStorageController {
 
     @GetMapping("/list")
     @PreAuthorize("hasAuthority('I-4')")
-    public RS getListByInStorage(@RequestParam String inStorageId) {
-        return RS.ok(this.dao.getByInStorageId(inStorageId).stream().map(item -> {
+    public RS getListByInStorage(@RequestParam String inStorageId, @RequestParam(required = false) String outCode, @RequestParam(required = false) String outStarttime, @RequestParam(required = false) String outEndtime) {
+        return RS.ok(this.dao.getByInStorageId(inStorageId, outCode, outStarttime, outEndtime).stream().map(item -> {
             OutStorageAo aoInner = new OutStorageAo();
+            InStorageDo inStorageDo = this.inStorageDao.getById(inStorageId);
+            OrderDo orderDo = this.orderDao.getById(inStorageDo.getOrderId());
             BeanUtils.copyProperties(item, aoInner);
             aoInner.setOutType(OutType.getNameByIndex(Integer.parseInt(item.getOutType())));
+            aoInner.setCustomerName(this.dictController.getById(orderDo.getCustomerName()).getItemName());
+            aoInner.setImage(orderDo.getImage());
+            aoInner.setItem(orderDo.getItem());
+            aoInner.setPoNum(orderDo.getPoNum());
+            aoInner.setPart(orderDo.getPart());
+            aoInner.setColor(this.dictController.getById(orderDo.getColor()).getItemName());
+            aoInner.setBake(this.dictController.getById(orderDo.getBake()).getItemName());
+            aoInner.setCount(orderDo.getCount() + "");
+            aoInner.setInCount(inStorageDo.getInCount());
             return aoInner;
         }).collect(Collectors.toList()));
     }
 
     @GetMapping("/one")
     @PreAuthorize("hasAuthority('I-4')")
-    public RS getOneByInStorage(@RequestParam String outStorageId) {
-        return RS.ok(this.dao.getById(outStorageId).stream().map(item -> {
+    public RS getOneByInStorage(@RequestParam String outStorageId, @RequestParam(required = false) String outCode, @RequestParam(required = false) String outStarttime, @RequestParam(required = false) String outEndtime) {
+        return RS.ok(this.dao.getById(outStorageId, outCode, outStarttime, outEndtime).stream().map(item -> {
             OutStorageAo aoInner = new OutStorageAo();
+            InStorageDo inStorageDo = this.inStorageDao.getById(item.getInStorageId());
+            OrderDo orderDo = this.orderDao.getById(inStorageDo.getOrderId());
             BeanUtils.copyProperties(item, aoInner);
             aoInner.setOutType(OutType.getNameByIndex(Integer.parseInt(item.getOutType())));
+            aoInner.setCustomerName(this.dictController.getById(orderDo.getCustomerName()).getItemName());
+            aoInner.setImage(orderDo.getImage());
+            aoInner.setItem(orderDo.getItem());
+            aoInner.setPoNum(orderDo.getPoNum());
+            aoInner.setPart(orderDo.getPart());
+            aoInner.setColor(this.dictController.getById(orderDo.getColor()).getItemName());
+            aoInner.setBake(this.dictController.getById(orderDo.getBake()).getItemName());
+            aoInner.setCount(orderDo.getCount() + "");
+            aoInner.setInCount(inStorageDo.getInCount());
             return aoInner;
         }).collect(Collectors.toList()));
     }
+
     @PostMapping("/excel")
     @PreAuthorize("hasAuthority('I-4')")
     public void download(HttpServletResponse response, @RequestBody OutStorageExcelAo outStorageExcelAo) throws Exception {
@@ -182,19 +215,7 @@ public class OutStorageController {
         response.setHeader("Content-disposition", "attachment;filename=" + fileName + ".xlsx;" + "filename*=utf-8''" + fileName + ".xlsx");
         OutputStream outputStream = response.getOutputStream();
         //FileOutputStream outputStream = new FileOutputStream("/home/sorawingwind/桌面/xx.xlsx");
-
-        //获取数据
-        List<OutStorageAo> listdo = this.dao.getExcels(outStorageExcelAo.getCustomerNameItem(), outStorageExcelAo.getCode(), outStorageExcelAo.getStarttime(), outStorageExcelAo.getEndtime()).stream().map(iitem -> {
-            iitem.setCustomerName(dictController.getById(iitem.getCustomerName()).getItemName());
-            iitem.setColor(dictController.getById(iitem.getColor()).getItemName());
-            iitem.setBake(dictController.getById(iitem.getBake()).getItemName());
-            if(iitem.getOrderPartSumCount()!= null){
-                int outSumBunchCount = this.dao.getSumBunchCount(iitem.getOrderId());
-                iitem.setLeftPartSumCount(iitem.getOrderPartSumCount() - outSumBunchCount);
-            }
-            return iitem;
-        }).collect(Collectors.toList());
-        List<OutStorageEto> listeto = new ListUtil<OutStorageAo, OutStorageEto>().copyList(listdo, OutStorageEto.class);
+        List<OutStorageEto> listeto = this.getAndBuildEtos(outStorageExcelAo.getCustomerNameItem(), outStorageExcelAo.getItem(), outStorageExcelAo.getPoNum(), outStorageExcelAo.getCode(), outStorageExcelAo.getStarttime(), outStorageExcelAo.getEndtime());
         // 获取模板路径
         InputStream resourceAsStream = this.getClass().getResourceAsStream("/excel/outStorage.xlsx");
         // 创建输出的excel对象
@@ -204,5 +225,39 @@ public class OutStorageController {
         write.fill(listeto, sheet1);
         // 关闭流
         write.finish();
+    }
+
+    public List<OutStorageEto> getAndBuildEtos(String customerNameItem,String item,String poNum,String code,String starttime,String endtime){
+        //获取数据
+        List<OutStorageAo> listdo = this.dao.getExcels(customerNameItem,item,poNum,code,starttime,endtime).stream().map(iitem -> {
+            iitem.setCustomerName(dictController.getById(iitem.getCustomerName()).getItemName());
+            iitem.setColor(dictController.getById(iitem.getColor()).getItemName());
+            iitem.setBake(dictController.getById(iitem.getBake()).getItemName());
+            iitem.setTime(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(iitem.getCreateTime()));
+            if (iitem.getOrderPartSumCount() != null) {
+                int outSumBunchCount = this.dao.getSumBunchCount(iitem.getOrderId());
+                iitem.setLeftPartSumCount(iitem.getOrderPartSumCount() - outSumBunchCount);
+            }
+            return iitem;
+        }).collect(Collectors.toList());
+        return new ListUtil<OutStorageAo, OutStorageEto>().copyList(listdo, OutStorageEto.class);
+
+    }
+
+    public List<OutStorageEto> getAndBuildEtosByIn(String inids,String code,String starttime,String endtime){
+        //获取数据
+        List<OutStorageAo> listdo = this.dao.getExcelsByIn(inids,code,starttime,endtime).stream().map(iitem -> {
+            iitem.setCustomerName(dictController.getById(iitem.getCustomerName()).getItemName());
+            iitem.setColor(dictController.getById(iitem.getColor()).getItemName());
+            iitem.setBake(dictController.getById(iitem.getBake()).getItemName());
+            iitem.setTime(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(iitem.getCreateTime()));
+            if (iitem.getOrderPartSumCount() != null) {
+                int outSumBunchCount = this.dao.getSumBunchCount(iitem.getOrderId());
+                iitem.setLeftPartSumCount(iitem.getOrderPartSumCount() - outSumBunchCount);
+            }
+            return iitem;
+        }).collect(Collectors.toList());
+        return new ListUtil<OutStorageAo, OutStorageEto>().copyList(listdo, OutStorageEto.class);
+
     }
 }

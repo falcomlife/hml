@@ -1,4 +1,4 @@
-cp -rf ../../tq-web/dist/* ../storage/src/main/resources/static/web/
+cp -rf ../../hml-web/dist/* ../storage/src/main/resources/static/web/
 cd ../
 mvn clean install -Dmaven.test.skip=true
 cd -

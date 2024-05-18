@@ -61,6 +61,8 @@ public class InStorageAo {
 
     private BigDecimal count;
 
+    private BigDecimal partSumCount;
+
     private BigDecimal bunchCount;
 
     private String bake;

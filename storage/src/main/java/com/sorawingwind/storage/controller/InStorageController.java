@@ -53,46 +53,47 @@ public class InStorageController {
 
     @GetMapping
     @PreAuthorize("hasAuthority('I-1')")
-    public RS getByPage(@RequestParam int pageIndex, @RequestParam int pageSize, @RequestParam(required = false) String customerNameItem, @RequestParam(required = false) String incomingTypeItem, @RequestParam(required = false) String code, @RequestParam(required = false) String starttime, @RequestParam(required = false) String endtime) {
-        List<SqlRow> list = this.dao.getByPage(pageIndex, pageSize, customerNameItem, incomingTypeItem, code, starttime, endtime);
-        int totleRowCount = this.dao.getCountByPage(pageIndex, pageSize, customerNameItem, incomingTypeItem, code, starttime, endtime);
+    public RS getByPage(@RequestParam int pageIndex, @RequestParam int pageSize, @RequestParam(required = false) String customerNameItem, @RequestParam(required = false) String item, @RequestParam(required = false) String poNum, @RequestParam(required = false) String incomingTypeItem, @RequestParam(required = false) String code, @RequestParam(required = false) String starttime, @RequestParam(required = false) String endtime) {
+        List<SqlRow> list = this.dao.getByPage(pageIndex, pageSize, customerNameItem, item, poNum, incomingTypeItem, code, starttime, endtime);
+        int totleRowCount = this.dao.getCountByPage(pageIndex, pageSize, customerNameItem, item, poNum, incomingTypeItem, code, starttime, endtime);
         List<DictDo> customerDicts = this.dictController.getDictDoByType("customer");
         List<DictDo> colorDicts = this.dictController.getDictDoByType("color");
         List<DictDo> incomingtypeDicts = this.dictController.getDictDoByType("incomingtype");
         List<DictDo> ctDicts = this.dictController.getDictDoByType("ct");
-        List<InStorageAo> listaor = list.stream().map(item -> {
+        List<InStorageAo> listaor = list.stream().map(itemInner -> {
             InStorageAo aoInner = new InStorageAo();
-            aoInner.setId(item.getString("id"));
-            aoInner.setOutStorageCode(item.getString("out_storage_code"));
-            aoInner.setCode(item.getString("code"));
-            aoInner.setBunchCount(item.getBigDecimal("bunch_count"));
-            aoInner.setCreateTime(item.getDate("create_time"));
-            aoInner.setImage(item.getString("image"));
-            aoInner.setInCount(item.getString("in_count"));
-            aoInner.setUnit(InUnit.getNameByIndex(Integer.parseInt(item.getString("unit"))));
-            aoInner.setUnitId(item.getString("unit"));
-            aoInner.setName(item.getString("name"));
-            aoInner.setPoNum(item.getString("po_num"));
-            aoInner.setItem(item.getString("item"));
-            aoInner.setPart(item.getString("part"));
-            aoInner.setCount(item.getBigDecimal("count"));
-            aoInner.setOrderId(item.getString("order_id"));
-            aoInner.setOrderCode(item.getString("order_code"));
+            aoInner.setId(itemInner.getString("id"));
+            aoInner.setOutStorageCode(itemInner.getString("out_storage_code"));
+            aoInner.setCode(itemInner.getString("code"));
+            aoInner.setBunchCount(itemInner.getBigDecimal("bunch_count"));
+            aoInner.setCreateTime(itemInner.getDate("create_time"));
+            aoInner.setImage(itemInner.getString("image"));
+            aoInner.setInCount(itemInner.getString("in_count"));
+            aoInner.setUnit(InUnit.getNameByIndex(Integer.parseInt(itemInner.getString("unit"))));
+            aoInner.setUnitId(itemInner.getString("unit"));
+            aoInner.setName(itemInner.getString("name"));
+            aoInner.setPoNum(itemInner.getString("po_num"));
+            aoInner.setItem(itemInner.getString("item"));
+            aoInner.setPart(itemInner.getString("part"));
+            aoInner.setCount(itemInner.getBigDecimal("count"));
+            aoInner.setPartSumCount(itemInner.getBigDecimal("part_sum_count"));
+            aoInner.setOrderId(itemInner.getString("order_id"));
+            aoInner.setOrderCode(itemInner.getString("order_code"));
             aoInner.setIsDelete(0);
-            aoInner.setCustomerName(customerDicts.stream().filter(dict -> dict.getId().equals(item.getString("customer_name"))).findFirst().get().getItemName());
-            aoInner.setCustomerNameId(item.getString("customer_name"));
-//            if (StringUtils.isNotBlank(item.getString("color"))) {
-//                aoInner.setColor(colorDicts.stream().filter(dict -> dict.getId().equals(item.getString("color"))).findFirst().get().getItemName());
+            aoInner.setCustomerName(customerDicts.stream().filter(dict -> dict.getId().equals(itemInner.getString("customer_name"))).findFirst().get().getItemName());
+            aoInner.setCustomerNameId(itemInner.getString("customer_name"));
+//            if (StringUtils.isNotBlank(itemInner.getString("color"))) {
+//                aoInner.setColor(colorDicts.stream().filter(dict -> dict.getId().equals(itemInner.getString("color"))).findFirst().get().getItemName());
 //            }
-            aoInner.setColorId(item.getString("color"));
-            aoInner.setOrderColor(colorDicts.stream().filter(dict -> dict.getId().equals(item.getString("order_color"))).findFirst().get().getItemName());
-            aoInner.setOrderColorId(item.getString("order_color"));
-            aoInner.setIncomingType(incomingtypeDicts.stream().filter(dict -> dict.getId().equals(item.getString("incoming_type"))).findFirst().get().getItemName());
-            aoInner.setIncomingTypeId(item.getString("incoming_type"));
-            aoInner.setIncomingReason(item.getString("incoming_reason"));
-            aoInner.setBadReason(item.getString("bad_reason"));
-            aoInner.setBake(ctDicts.stream().filter(dict -> dict.getId().equals(item.getString("bake"))).findFirst().get().getItemName());
-            aoInner.setBakeId(item.getString("bake"));
+            aoInner.setColorId(itemInner.getString("color"));
+            aoInner.setOrderColor(colorDicts.stream().filter(dict -> dict.getId().equals(itemInner.getString("order_color"))).findFirst().get().getItemName());
+            aoInner.setOrderColorId(itemInner.getString("order_color"));
+            aoInner.setIncomingType(incomingtypeDicts.stream().filter(dict -> dict.getId().equals(itemInner.getString("incoming_type"))).findFirst().get().getItemName());
+            aoInner.setIncomingTypeId(itemInner.getString("incoming_type"));
+            aoInner.setIncomingReason(itemInner.getString("incoming_reason"));
+            aoInner.setBadReason(itemInner.getString("bad_reason"));
+            aoInner.setBake(ctDicts.stream().filter(dict -> dict.getId().equals(itemInner.getString("bake"))).findFirst().get().getItemName());
+            aoInner.setBakeId(itemInner.getString("bake"));
             return aoInner;
         }).collect(Collectors.toList());
         return RS.ok(new PageRS<>(pageSize, pageIndex, totleRowCount, totleRowCount / pageSize, listaor));
@@ -276,20 +277,31 @@ public class InStorageController {
         iao.setItem(doo.getItem());
         iao.setPart(doo.getPart());
         iao.setCount(doo.getCount());
+        iao.setPartSumCount(doo.getPartSumCount());
         return RS.ok(iao);
     }
 
     @GetMapping("/order")
     @PreAuthorize("hasAuthority('I-1')")
-    public RS getByOrderId(@RequestParam String orderId) {
-        return RS.ok(this.dao.getByOrderId(orderId).stream().map(item -> {
+    public RS getByOrderId(@RequestParam String orderId,@RequestParam(required = false) String inCode,@RequestParam(required = false) String outCode,@RequestParam(required = false) String inStarttime, @RequestParam(required = false) String inEndtime,@RequestParam(required = false) String outStarttime, @RequestParam(required = false) String outEndtime) {
+        return RS.ok(this.dao.getByOrderId(orderId,inCode,outCode,inStarttime,inEndtime,outStarttime,outEndtime).stream().map(item -> {
+            OrderDo order = this.orderDao.getById(orderId);
             InStorageAo aoInner = new InStorageAo();
             BeanUtils.copyProperties(item, aoInner);
 //            aoInner.setColor(dictController.getById(item.getColor()).getItemName());
 //            aoInner.setColorId(item.getColor());
             aoInner.setIncomingType(dictController.getById(item.getIncomingType()).getItemName());
             aoInner.setIncomingTypeId(item.getIncomingType());
+            aoInner.setBadReason(item.getBadReason());
             aoInner.setIncomingReason(item.getIncomingReason());
+            aoInner.setCustomerName(dictController.getById(order.getCustomerName()).getItemName());
+            aoInner.setCount(order.getCount());
+            aoInner.setPoNum(order.getPoNum());
+            aoInner.setUnit(InUnit.getNameByIndex(Integer.parseInt(item.getUnit())));
+            aoInner.setItem(order.getItem());
+            aoInner.setPart(order.getPart());
+            aoInner.setOrderColor(dictController.getById(order.getColor()).getItemName());
+            aoInner.setBake(dictController.getById(order.getBake()).getItemName());
             List<OutStorageAo> list = new ArrayList<>();
             if (StringUtils.isNotBlank(item.getOutStorageId())) {
                 OutStorageAo ao = new OutStorageAo();
@@ -332,18 +344,7 @@ public class InStorageController {
         response.setHeader("Access-Control-Expose-Headers", "Content-Disposition");
         response.setHeader("Content-disposition", "attachment;filename=" + fileName + ".xlsx;" + "filename*=utf-8''" + fileName + ".xlsx");
         OutputStream outputStream = response.getOutputStream();
-        //FileOutputStream outputStream = new FileOutputStream("/home/sorawingwind/桌面/xx.xlsx");
-        //String customerNameItem, String incomingTypeItem, String code, String starttime,  String endtime
-        List<DictDo> customerDicts = this.dictController.getDictDoByType("customer");
-        List<DictDo> colorDicts = this.dictController.getDictDoByType("color");
-        //获取数据
-        List<InStorageEto> listeto = this.dao.getExcels(inStorageExcelAo.getCustomerNameItem(), inStorageExcelAo.getIncomingType(), inStorageExcelAo.getCode(), inStorageExcelAo.getStarttime(), inStorageExcelAo.getEndtime());
-        listeto.stream().forEach(item ->
-            {
-                item.setCustomerName(customerDicts.stream().filter(c -> c.getId().equals(item.getCustomerName())).findFirst().get().getItemName());
-                item.setOrderColor(colorDicts.stream().filter(c -> c.getId().equals(item.getOrderColor())).findFirst().get().getItemName());
-            }
-        );
+        List<InStorageEto> listeto = this.getAndBuildEtos(inStorageExcelAo.getCustomerNameItem(), inStorageExcelAo.getItem(), inStorageExcelAo.getPoNum(), inStorageExcelAo.getIncomingType(), inStorageExcelAo.getCode(), inStorageExcelAo.getStarttime(), inStorageExcelAo.getEndtime());
         // 获取模板路径
         InputStream resourceAsStream = this.getClass().getResourceAsStream("/excel/inStorage.xlsx");
         // 创建输出的excel对象
@@ -354,4 +355,36 @@ public class InStorageController {
         // 关闭流
         write.finish();
     }
+
+    public List<InStorageEto> getAndBuildEtos(String customerNameItem,String item,String poNum,String incomingType,String code,String starttime,String endtime){
+        List<DictDo> customerDicts = this.dictController.getDictDoByType("customer");
+        List<DictDo> colorDicts = this.dictController.getDictDoByType("color");
+        //获取数据
+        List<InStorageEto> listeto = this.dao.getExcels(customerNameItem,item,poNum,incomingType,code,starttime,endtime);
+        listeto.stream().forEach(it ->
+                {
+                    it.setCustomerName(customerDicts.stream().filter(c -> c.getId().equals(it.getCustomerName())).findFirst().get().getItemName());
+                    it.setOrderColor(colorDicts.stream().filter(c -> c.getId().equals(it.getOrderColor())).findFirst().get().getItemName());
+                    it.setBake(this.dictController.getById(it.getBake()).getItemName());
+                    it.setIncomingType(this.dictController.getById(it.getIncomingType()).getItemName());
+                }
+        );
+        return listeto;
+    }
+    public List<InStorageEto> getAndBuildEtosByOrder(String orderIds,String code,String starttime,String endtime,String outcode,String outstarttime,String outendtime){
+        List<DictDo> customerDicts = this.dictController.getDictDoByType("customer");
+        List<DictDo> colorDicts = this.dictController.getDictDoByType("color");
+        //获取数据
+        List<InStorageEto> listeto = this.dao.getExcelsByOrder(orderIds,code,starttime,endtime,outcode,outstarttime,outendtime);
+        listeto.stream().forEach(it ->
+                {
+                    it.setCustomerName(customerDicts.stream().filter(c -> c.getId().equals(it.getCustomerName())).findFirst().get().getItemName());
+                    it.setOrderColor(colorDicts.stream().filter(c -> c.getId().equals(it.getOrderColor())).findFirst().get().getItemName());
+                    it.setBake(this.dictController.getById(it.getBake()).getItemName());
+                    it.setIncomingType(this.dictController.getById(it.getIncomingType()).getItemName());
+                }
+        );
+        return listeto;
+    }
+
 }

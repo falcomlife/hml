@@ -3,6 +3,7 @@ package com.cotte.estate.bean.pojo.eto;
 import lombok.Data;
 import javax.persistence.Entity;
 import java.math.BigDecimal;
+import java.util.Date;
 import java.util.List;
 
 @Entity
@@ -25,5 +26,19 @@ public class OrderEto {
     private Integer partSumCountSubOutStroageGoodsSumCount;
     //出库组件超过订单组件的数量
     private Integer overPartSumCount;
+    // 返镀数量
+    private Integer replatCount;
+    // 返镀比率
+    private BigDecimal replatRatio;
+    // 来料异常数量
+    private Integer incomingCount;
+    // 来料异常比率
+    private BigDecimal incomingRatio;
+    //出库类型为打底的组件数
+    private Integer outStroagePrimingSumCount;
+    //出库类型为打底的组件数/订单总数=打底比率
+    private BigDecimal outStroagePrimingSumCountRatio;
+    private String delTime;
+    private Date deliveryTime;
     private String time;
 }

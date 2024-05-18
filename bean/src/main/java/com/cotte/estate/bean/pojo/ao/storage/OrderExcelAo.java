@@ -21,9 +21,17 @@ public class OrderExcelAo {
 
     private String customerNameItem;
     private String code;
+    private String inCode;
+    private String incomingType;
+    private String outCode;
     private String po;
     private String item;
     private String starttime;
     private String endtime;
-
+    private String inStarttime;
+    private String inEndtime;
+    private String outStarttime;
+    private String outEndtime;
+    private String deliveryStarttime;
+    private String deliveryEndtime;
 }

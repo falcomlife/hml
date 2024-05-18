@@ -50,11 +50,18 @@ public class OrderAo {
 
     private BigDecimal count;
 
+    //订单组件总数
     private BigDecimal partSumCount;
 
     private Integer partSumCountCal;
 
     private Integer outStroageGoodsSumCount;
+
+    //出库类型为打底的组件数
+    private Integer outStroagePrimingSumCount;
+
+    //出库类型为打底的组件数/订单总数=打底比率
+    private BigDecimal outStroagePrimingSumCountRatio;
 
     private BigDecimal outStroageSumCount;
 
@@ -66,18 +73,22 @@ public class OrderAo {
     private BigDecimal price;
 
     private BigDecimal sum;
-
+    // 返镀数量
     private Integer replatCount;
-
+    // 返镀比率
     private BigDecimal replatRatio;
-
+    // 来料异常数量
     private Integer incomingCount;
-
+    // 来料异常比率
     private BigDecimal incomingRatio;
 
     private Boolean incomingBigger;
 
     private Boolean outStorageBigger;
+    // 交货时间
+    @Temporal(TemporalType.TIMESTAMP)
+    @JsonFormat(shape = JsonFormat.Shape.STRING, timezone = "GMT+8", pattern = "yyyy-MM-dd")
+    private Date deliveryTime;
 
     @Temporal(TemporalType.TIMESTAMP)
     @JsonFormat(shape = JsonFormat.Shape.STRING, timezone = "GMT+8", pattern = "yyyy-MM-dd HH:mm:ss")

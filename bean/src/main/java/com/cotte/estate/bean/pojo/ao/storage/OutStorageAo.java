@@ -58,6 +58,8 @@ public class OutStorageAo {
 
     private String count;
 
+    private BigDecimal partSumCount;
+
     private BigDecimal bunchCount;
 
     private String bake;
@@ -71,6 +73,8 @@ public class OutStorageAo {
     private String outType;
 
     private String inCount;
+
+    private String time;
 
     @Temporal(TemporalType.TIMESTAMP)
     @JsonFormat(shape = JsonFormat.Shape.STRING, timezone = "GMT+8", pattern = "yyyy-MM-dd HH:mm:ss")

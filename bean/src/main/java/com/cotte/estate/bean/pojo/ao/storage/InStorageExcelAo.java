@@ -27,6 +27,8 @@ public class InStorageExcelAo {
     private String customerNameItem;
     private String incomingType;
     private String code;
+    private String item;
+    private String poNum;
     private String starttime;
     private String endtime;
 
