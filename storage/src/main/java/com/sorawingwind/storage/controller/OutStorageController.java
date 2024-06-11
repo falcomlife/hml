@@ -77,6 +77,7 @@ public class OutStorageController {
             aoInner.setBunchCount(itemInner.getBigDecimal("bunch_count"));
             aoInner.setCreateTime(itemInner.getDate("create_time"));
             aoInner.setImage(itemInner.getString("image"));
+            aoInner.setOtimage(itemInner.getString("otimage"));
             aoInner.setOutCount(itemInner.getString("out_count"));
             aoInner.setName(itemInner.getString("name"));
             aoInner.setPoNum(itemInner.getString("po_num"));
@@ -111,6 +112,7 @@ public class OutStorageController {
         calendar.add(Calendar.DAY_OF_MONTH, 1);
         Date end = calendar.getTime();
         int count = Ebean.createQuery(OutStorageDo.class).where().ge("create_time", start).le("create_time", end).findCount();
+        doo.setImage(outStorageAo.getOtimage());
         doo.setCode(CodeGenerUtil.getCode("O", count));
         doo.setId(UUIDUtil.simpleUUid());
         doo.setCreateTime(new Date());
@@ -124,6 +126,7 @@ public class OutStorageController {
     public RS update(@RequestBody OutStorageAo outStorageAo) {
         OutStorageDo doo = new OutStorageDo();
         BeanUtils.copyProperties(outStorageAo, doo);
+        doo.setImage(outStorageAo.getOtimage());
         doo.setModifiedTime(new Date());
         this.dao.update(doo);
         return RS.ok();
@@ -172,6 +175,7 @@ public class OutStorageController {
             aoInner.setOutType(OutType.getNameByIndex(Integer.parseInt(item.getOutType())));
             aoInner.setCustomerName(this.dictController.getById(orderDo.getCustomerName()).getItemName());
             aoInner.setImage(orderDo.getImage());
+            aoInner.setOtimage(item.getImage());
             aoInner.setItem(orderDo.getItem());
             aoInner.setPoNum(orderDo.getPoNum());
             aoInner.setPart(orderDo.getPart());
@@ -194,6 +198,7 @@ public class OutStorageController {
             aoInner.setOutType(OutType.getNameByIndex(Integer.parseInt(item.getOutType())));
             aoInner.setCustomerName(this.dictController.getById(orderDo.getCustomerName()).getItemName());
             aoInner.setImage(orderDo.getImage());
+            aoInner.setOtimage(item.getImage());
             aoInner.setItem(orderDo.getItem());
             aoInner.setPoNum(orderDo.getPoNum());
             aoInner.setPart(orderDo.getPart());

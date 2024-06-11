@@ -41,6 +41,7 @@ public class OutStorageDao {
         sb.append(" i.code as in_storage_code, ");
         sb.append(" i.name as name, ");
         sb.append(" i.image as image, ");
+        sb.append(" ot.image as otimage, ");
         sb.append(" o.bake as bake, ");
         sb.append(" i.bunch_count as in_count ");
         sb.append(" from b_out_storage ot ");

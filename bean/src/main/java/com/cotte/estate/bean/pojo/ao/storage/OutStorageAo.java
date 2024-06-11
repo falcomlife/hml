@@ -42,6 +42,8 @@ public class OutStorageAo {
 
     private String image;
 
+    private String otimage;
+
     private String code;
     
     private String name;
